@@ -11,12 +11,19 @@
 <h1 th:text="${test}">static</h1>
 <h1 th:text="${var}">static</h1>
 -->
+
 <h1>login</h1><br>
 enter email and password
+
+<!--form method="post" th:action="@{/Home}"-->
+
 <form method="post">
 email: <input type="text" name="email"></input><br>
 pass: <input type="text" name="pass"></input><br>
-<input type="submit" name="action" value="login"></input> 
+<input type="submit"></input> 
+
+<!--input type="submit" name="action" value="login"></input--> 
+
 </form>
 
 </body>
