@@ -3,6 +3,7 @@ package it.polimi.tiw.controllers;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -29,7 +30,7 @@ public class Home extends HttpServlet {
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 	private static final long serialVersionUID = 1L;
-       
+		
 	
     public Home() {
         super();
@@ -45,7 +46,7 @@ public class Home extends HttpServlet {
     	    final String PASS = "MirkoGentile9!";
     	    
 		    Class.forName("com.mysql.cj.jdbc.Driver");
-	    	Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+	    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
 
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -74,34 +75,51 @@ public class Home extends HttpServlet {
 		response.setContentType("text/html");
 		
 		PrintWriter out = response.getWriter();
-
-		
-		//check session-context attributes
-		//request.getRequestDispatcher("/WEB-INF/testpage.html").include(request, response);
-	  	    
+	  	   
 				
 		String path = "/WEB-INF/html/home.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext);
 		
 		try {
+			String arg = request.getParameter("corso");
+			ctx.setVariable("appelli", new DataAccess(connection).getAppelliFromCorso(arg));
+			
 			ctx.setVariable("corsi", new DataAccess(connection).getCorsi());
+			
+			//non funzionano
+			ctx.setVariable("sel1", request.getParameter("corso"));
+			ctx.setVariable("sel2", request.getParameter("appello"));
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		templateEngine.process(path, ctx, out);	
-		
-		
-		//String ctxpath = getServletContext().getContextPath();
-		//String path = ctxpath + "/Login";
-		//response.sendRedirect("/WEB-INF/html/Login");
-		
+		templateEngine.process(path, ctx, out);			
 		
 	}
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+		
+		String mode = request.getParameter("mode");
+		switch(mode) {
+			case "refresh":
+				
+				//vedere come settare una variabile visibile anche dalla get
+				
+				doGet(request, response);
+				break;
+				
+			case "submit":
+				
+				if(request.getParameter("appello") != null) {}
+				else {
+					doGet(request, response);
+					response.getWriter().println("select a date");	
+				}
+				
+				break;
+			}
 			
 	}
 	

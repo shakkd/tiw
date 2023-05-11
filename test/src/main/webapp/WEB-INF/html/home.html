@@ -7,13 +7,18 @@
 <body>
 <h1>homepage</h1><br>
 
-<select name="corsi">  
-  <option th:each="i : ${corsi}" th:value="${i}" th:text="${i}"></option> 
-</select>
+<form method="post">
+<select name="corso">  
+  <option th:each="i : ${corsi}" th:value="${i}" th:text="${i}" th:selected="${sel1}"></option> 
+</select><br>
 
-<select name="appelli">  
-  <option th:each="i : ${appelli}" th:value="${i}" th:text="${i}"></option> 
-</select>    
+<select name="appello">  
+  <option th:each="i : ${appelli}" th:value="${i}" th:text="${i}" th:selected="${sel2}"></option> 
+</select><br>
+
+<input type="submit" name="mode" value="refresh"></input>
+<input type="submit" name="mode" value="submit"></input> 
+</form>
 
 </body>
 </html>

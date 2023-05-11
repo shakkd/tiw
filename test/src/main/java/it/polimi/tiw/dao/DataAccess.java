@@ -4,6 +4,7 @@ import java.util.List;
 
 import java.util.ArrayList;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,18 +47,31 @@ public class DataAccess {
 	
 	
 	public List<String> getCorsi() throws SQLException {
-		List<String> corsi = new ArrayList<>();
+		List<String> ret = new ArrayList<>();
 		
 		try (Statement stmnt = connection.createStatement();
 				ResultSet result = stmnt.executeQuery("SELECT * FROM Corso");) {
 
-			while (result.next()) corsi.add(result.getString("nomeCorso"));
+			while (result.next()) ret.add(result.getString("nomeCorso"));
 
 		}
 		
-		return corsi;
+		return ret;
 	}
 
-	
+	public List<Date> getAppelliFromCorso(String corso) throws SQLException {
+		List<Date> ret = new ArrayList<>();
+		
+		try (Statement stmnt = connection.createStatement();
+				ResultSet result = stmnt.executeQuery(
+					"SELECT data FROM Corso C, Appello A WHERE A.nomeCorso = C.nomeCorso AND A.nomeCorso = '" + corso + "'"
+				);) {
+
+			while (result.next()) ret.add(result.getDate("data"));
+
+		}
+		return ret;
+		
+	}
 
 }

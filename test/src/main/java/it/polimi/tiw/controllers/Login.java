@@ -98,19 +98,21 @@ public class Login extends HttpServlet {
 				
 		String email = request.getParameter("email");
 		String passw = request.getParameter("pass");
-		String userType = null;
 		
 		boolean ok = false;
 		
 		try {
 			for(Utente tmp : new DataAccess(connection).findAllUtenti())
-				if(tmp.getEmail().equals(email) && tmp.getPassword().equals(passw)) ok = true;
+				if(tmp.getEmail().equals(email) && tmp.getPassword().equals(passw)) {
+					ok = true;
+					request.getSession().setAttribute("type", tmp.getTipo());
+				}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		if(ok) 
-			response.sendRedirect("/Home");	
+		if(ok)
+			response.sendRedirect("/test/home");
 		else {
 			doGet(request, response);
 			out.println("access denied");
