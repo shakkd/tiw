@@ -2,6 +2,8 @@ package it.polimi.tiw.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.*;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -15,19 +17,25 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+
+//sfrutta motore per main page(gestita da home servlet),
+//  la pagina di login reinderizza alla main page, dalla main page si sfruttano
+//  tutte le funzioni e ritornano
+
 @WebServlet("/testing")
-public class servlet1 extends HttpServlet {
+public class home extends HttpServlet {
 	
 	private TemplateEngine templateEngine;
 	private static final long serialVersionUID = 1L;
 	       
 
-    public servlet1() {
+    public home() {
         super();
     }
 
     public void init() throws ServletException {
-		
+    	
+		//web engine setup
 		ServletContext ctx = getServletContext();
 		
 		ServletContextTemplateResolver tmpl = new ServletContextTemplateResolver(ctx);  
@@ -35,8 +43,9 @@ public class servlet1 extends HttpServlet {
 		this.templateEngine = new TemplateEngine();
 		this.templateEngine.setTemplateResolver(tmpl);
 		
-		tmpl.setPrefix("/WEB-INF/");
-		tmpl.setSuffix(".html");
+		//tmpl.setPrefix("/WEB-INF/");
+		//tmpl.setSuffix(".html");
+		
 	}
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -45,62 +54,125 @@ public class servlet1 extends HttpServlet {
 		
 		PrintWriter out = response.getWriter();
 
-		String test = "test123";
-		String var = "var123";
 		
 		//check session-context attributes
 		//request.getRequestDispatcher("/WEB-INF/testpage.html").include(request, response);
-
+	  	    
 				
-		String path = "html/loginpage";
+		String path = "/WEB-INF/html/loginpage.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext);
 		
-		ctx.setVariable("test", test);
-		ctx.setVariable("var", var);
+		//String var = "var123";
+		//ctx.setVariable("var", var);
 		
 		templateEngine.process(path, ctx, out);		
 		
-		
-		/*
-		out.println("<form method=\"post\">");
-		out.println("<button type=\"submit\" name=\"btn\" value=\"button1\">test1</button>");
-		out.println("<button type=\"submit\" name=\"btn\" value=\"button2\">test2</button>");
-		out.println("<button type=\"submit\" name=\"btn\" value=\"button3\">test3</button>");
-		out.println("</form>");
-		*/
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
 		
 		PrintWriter out = response.getWriter();
 		
-		String user = request.getParameter("user");
-		String pass = request.getParameter("pass");
+		String mode = request.getParameter("action");
 		
-		if(user.equals("admin") && pass.equals("password"))
-			out.println("validated");
-		else
-			out.println("denied");
-	
+		String email = request.getParameter("email");
+		String passw = request.getParameter("pass");
 		
-		/*
-		PrintWriter out = response.getWriter();
-        String button = request.getParameter("btn");
+		boolean ok = false;
+		String userType = null;
 		
-        doGet(request, response);
-        
-        out.println("response: \n\n");
-        
-		if ("button1".equals(button)) {
-            out.println("button1");
-        } else if ("button2".equals(button)) {
-        	out.println("button2");
-        } else if ("button3".equals(button)) {
-        	out.println("button3");
-        }
-		*/		
+		
+    	//db setup
+    	final String DB_URL = "jdbc:mysql://localhost:3306/dbtest?serverTimezone=UTC";
+	    final String USER = "root";
+	    final String PASS = "MirkoGentile9!";
+	    
+
+	    
+	    //request handler
+	    switch(mode) {
+		    case "login":
+		    	
+			    try {
+			    	
+				    final String QUERY = "SELECT email, password, flag FROM Utente";
+			    	
+				    Class.forName("com.mysql.cj.jdbc.Driver");
+			    	Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		            Statement stmt = conn.createStatement();
+		            ResultSet rs = stmt.executeQuery(QUERY);
+		            
+			    	while (rs.next()) {
+			    		if(email.equals(rs.getString("email")) && passw.equals(rs.getString("password"))) {
+			    			ok = true;
+			    		
+			    			//userType = rs.getString("flag");
+			    		}		
+			    	}
+			    
+			    } catch (Exception e) {
+			      e.printStackTrace();
+			    }
+				
+				if(ok) {
+					
+					
+					//get courses and populate list
+					try {
+				    	
+					    final String QUERY = "SELECT nomeCorso FROM corso ORDER BY nomeCorso DESC";
+				    	
+					    Class.forName("com.mysql.cj.jdbc.Driver");
+				    	Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			            Statement stmt = conn.createStatement();
+			            ResultSet rs = stmt.executeQuery(QUERY);
+			            
+			            List<String> res = new ArrayList<> ();
+			            
+				    	while (rs.next()) res.add(rs.getString("nomeCorso"));
+				    	
+				    	
+				    	response.setContentType("text/html");
+		
+						String path = "/WEB-INF/html/home.html";
+						ServletContext servletContext = getServletContext();
+						final WebContext ctx = new WebContext(request, response, servletContext);
+						
+						ctx.setVariable("corsi", res);
+						
+						templateEngine.process(path, ctx, out);	
+
+						
+				    
+				    } catch (Exception e) {
+				      e.printStackTrace();
+				    }
+					
+					
+				} else {
+					doGet(request, response);
+					out.println("access denied");
+
+				}
+				break;
+			
+				
+			//possibilità di redirect ad una servlet nell attributo 
+			//	th:action del form alla submit tramite @{/serverPath} che gestirà la post request
+		    case "":
+		    	break;
+		    	
+		    			    	
+	    }
+		
+		
 	}
+	
+	
+	
+	
+	
 
 }
 	

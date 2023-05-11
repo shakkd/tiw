@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Home page</title>
+</head>
+<body>
+<h1>homepage</h1><br>
+
+<select name="corsi">  
+  <option th:each="i : ${corsi}" th:value="${i}" th:text="${i}"></option> 
+</select>
+
+<select name="appelli">  
+  <option th:each="i : ${appelli}" th:value="${i}" th:text="${i}"></option> 
+</select>    
+
+</body>
+</html>
