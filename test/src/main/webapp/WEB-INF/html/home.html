@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>Home page</title>
@@ -9,11 +9,11 @@
 
 <form method="post">
 <select name="corso">  
-  <option th:each="i : ${corsi}" th:value="${i}" th:text="${i}" th:selected="${sel1}"></option> 
+  <option th:each="i : ${corsi}" th:value="${i}" th:text="${i}" th:selected="${i == sel1}"></option> 
 </select><br>
 
 <select name="appello">  
-  <option th:each="i : ${appelli}" th:value="${i}" th:text="${i}" th:selected="${sel2}"></option> 
+  <option th:each="i : ${appelli}" th:value="${i}" th:text="${i}"></option> 
 </select><br>
 
 <input type="submit" name="mode" value="refresh"></input>

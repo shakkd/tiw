@@ -1,10 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Iscritti</title>
 </head>
 <body>
+
+
+<table>
+<tr>
+<!--  farli bottoni per invertire ordinamento -->
+  <th>Matricola</th>
+  <th>Cognome</th>
+  <th>Nome</th>
+  <th>Email</th>
+  <th>Corso Di Laurea</th>
+  <th>Voto</th>
+  <th>Stato di valutazione</th>
+  <th></th>
+</tr>
+<tr th:each="utenteVoto : ${utentiVoto}">
+  <td th:text="${utenteVoto.getUtente().getMatricola()}"></td>
+  <td th:text="${utenteVoto.getUtente().getCognome()}"></td>
+  <td th:text="${utenteVoto.getUtente().getNome()}"></td>
+  <td th:text="${utenteVoto.getUtente().getEmail()}"></td>
+  <td th:text="${utenteVoto.getUtente().getNomeCorsoLaurea()}"></td>
+  <td th:text="${utenteVoto.getStato()}"></td>
+  <td th:text="${utenteVoto.getVoto()}"></td>
+  <!-- pensare come fare sto bottone -->
+  <td><input type="submit" value="modifica"></input></td>
+  
+</tr>
+</table>
 
 </body>
 </html>

@@ -4,24 +4,29 @@ import java.io.Serializable;
 
 public class Utente implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	private String nome;
 	private String cognome;
 	private String email;
 	private String password;
 	private String tipo;
+	private String nomeCorsoLaurea;
 	private int matricola;
-
+	
 	public Utente() {
 	}
 	
-	public Utente(String nome, String cognome, String email, String password, String tipo, int matricola) {
+	public Utente(String nome, String cognome, String email, String password, String tipo, String nomeCorsoLaurea, int matricola) {
 		this.nome = nome;
 		this.cognome = cognome;
 		this.email = email;
 		this.password = password;
 		this.tipo = tipo;
+		this.nomeCorsoLaurea = nomeCorsoLaurea;
 		this.matricola = matricola;
 	}
+	
+
 	
 	public void setNome(String arg) {this.nome = arg;}
 	
@@ -46,6 +51,11 @@ public class Utente implements Serializable {
 	public void setTipo(String arg) {this.tipo = arg;}
 	
 	public String getTipo() {return this.tipo;}
+	
+	
+	public void setNomeCorsoLaurea(String arg) {this.nomeCorsoLaurea = arg;}
+	
+	public String getNomeCorsoLaurea() {return this.nomeCorsoLaurea;}
 	
 	
 	public void setMatricola(int arg) {this.matricola = arg;}
