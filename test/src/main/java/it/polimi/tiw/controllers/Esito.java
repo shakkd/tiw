@@ -19,6 +19,7 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import it.polimi.tiw.beans.UtenteVoto;
 import it.polimi.tiw.dao.DataAccess;
 
 
@@ -28,6 +29,13 @@ public class Esito extends HttpServlet {
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 	private static final long serialVersionUID = 1L;
+	
+	
+	String data = null;
+	String corso = null;
+	String idUtente = null;
+	
+	DataAccess dao;
        
 	public void init() throws ServletException {
     	
@@ -47,6 +55,8 @@ public class Esito extends HttpServlet {
 			e.printStackTrace();
 			throw new UnavailableException("Couldn't get db connection");
 		}
+    	
+    	dao = new DataAccess(connection);
     	
 		//web engine setup
 		ServletContext ctx = getServletContext();
@@ -70,14 +80,53 @@ public class Esito extends HttpServlet {
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		response.setContentType("text/html");
+		
+		PrintWriter out = response.getWriter();
+		
+				
+		String path = "/WEB-INF/html/esito.html";
+		ServletContext servletContext = getServletContext();
+		final WebContext ctx = new WebContext(request, response, servletContext);
+		
+		data = request.getParameter("data");
+		corso = request.getParameter("corso");
+		idUtente = (String) request.getSession().getAttribute("idUtente");
+		
+		UtenteVoto ret = null;
+		
+		try {
+			ret = dao.findEsito(data, corso, idUtente);
+			
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		if(ret.getVoto() == null) out.println("voto non ancora definito");
+		else ctx.setVariable("utenteVoto", ret);
+				
+		templateEngine.process(path, ctx, out);	
+		
+		
 	}
 
 
 	
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+
+		try {
+			dao.rifiutaVoto(data, corso, idUtente);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+		
 		doGet(request, response);
+		response.getWriter().println("il voto è stato rifiutato");
 	}
 
 	

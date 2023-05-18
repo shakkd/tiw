@@ -9,6 +9,9 @@ public class UtenteVoto implements Serializable{
 	private Utente utente;
 	private String voto;
 	private String stato;
+	private int id;
+	
+	private boolean rifiutabile = false;
 	
 	public UtenteVoto() {}
 	
@@ -33,8 +36,22 @@ public class UtenteVoto implements Serializable{
 
 	public void setStato (String arg) {
 		this.stato = arg;
+		
+		try {
+		
+			if (arg.equals("Pubblicato") && (Integer.parseInt(this.voto)) >= 18 && (Integer.parseInt(this.voto)) <= 30 )
+				this.rifiutabile = true;
+			else this.rifiutabile = false;
+			
+		} catch(NumberFormatException e) {
+			this.rifiutabile = false;
+		}
+		
+		
 	}
 	
 	public String getStato () {return this.stato;}
+	
+	public boolean getRifiutabile() {return this.rifiutabile;}
 	
 }

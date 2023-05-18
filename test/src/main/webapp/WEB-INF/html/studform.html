@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Esito</title>
+<title>Studente</title>
 </head>
 <body>
 
@@ -15,13 +15,14 @@ email: <input type="text" name="email" th:value="${utenteVoto.getUtente().getEma
 corso di laurea: <input type="text" name="corso di laurea" th:value="${utenteVoto.getUtente().getNomeCorsoLaurea()}" disabled></input><br>
 
 voto:
-<select name="voto" disabled>  
-  <option th:text="${utenteVoto.getVoto()}" ></option> 
-  <option text="" th:selected="${ utenteVoto.getVoto() == null }"></option>
+<select name="voto" th:disabled="${ utenteVoto.getStato() == 'Pubblicato' || utenteVoto.getStato() == 'Rifiutato' || utenteVoto.getStato() == 'Verbalizzato'}">  
+  <option value="null" text="" th:selected="${ utenteVoto.getVoto() == null }"></option>
+  <option th:each="i : ${voti}" th:value="${i}" th:text="${i}" th:selected="${ i == utenteVoto.getVoto() }"></option> 
 </select>
 
 stato di valutazione: <input type="text" name="stato di valutazione" th:value="${utenteVoto.getStato()}" disabled></input><br>
-<input type="submit" value="rifiuta" th:if="${ utenteVoto.getRifiutabile() }">
+<input type="submit" name="submit" value="insert">
+<input type="submit" name="submit" value="back">
 
 
 

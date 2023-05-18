@@ -30,6 +30,10 @@ public class Home extends HttpServlet {
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 	private static final long serialVersionUID = 1L;
+	
+	String idUtente = null;
+	
+	DataAccess dao;
 		
 	
     public Home() {
@@ -56,6 +60,8 @@ public class Home extends HttpServlet {
 			throw new UnavailableException("Couldn't get db connection");
 		}
     	
+    	dao = new DataAccess(connection);
+    	
 		//web engine setup
 		ServletContext ctx = getServletContext();
 		
@@ -75,18 +81,27 @@ public class Home extends HttpServlet {
 		response.setContentType("text/html");
 		
 		PrintWriter out = response.getWriter();
-	  	   
+		
+		
+		//request.getSession().removeAttribute("utentiVoto");
+		request.getSession().removeAttribute("data");
+		request.getSession().removeAttribute("corso");
+
+		
 				
 		String path = "/WEB-INF/html/home.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext);
 		
+		idUtente = (String) request.getSession().getAttribute("idUtente");
+		
 		try {
+			String flag = (String)request.getSession().getAttribute("type");
 			String arg = request.getParameter("corso");
 			ctx.setVariable("sel1", arg);
-			ctx.setVariable("corsi", new DataAccess(connection).getCorsi());
+			ctx.setVariable("corsi", dao.getCorsi(flag, idUtente));
 
-			ctx.setVariable("appelli", new DataAccess(connection).findAppelliFromCorso(arg));			
+			ctx.setVariable("appelli", dao.findAppelliFromCorso(arg));			
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -101,9 +116,7 @@ public class Home extends HttpServlet {
 		String mode = request.getParameter("mode");
 		switch(mode) {
 			case "refresh":
-				
-				//vedere come settare una variabile visibile anche dalla get
-				
+								
 				doGet(request, response);
 				break;
 				
@@ -114,11 +127,11 @@ public class Home extends HttpServlet {
 					switch ((String)request.getSession().getAttribute("type")) {
 						case "S":
 							response.sendRedirect("/test/esito?data=" + request.getParameter("appello") + 
-									"&corso=" + request.getParameter("corso"));
+									"&corso=" + request.getParameter("corso") + "&idUtente=" + idUtente);
 							break;
 						case "D":
 							response.sendRedirect("/test/iscritti?data=" + request.getParameter("appello") + 
-									"&corso=" + request.getParameter("corso"));
+									"&corso=" + request.getParameter("corso") + "&order=Matricola");
 							break;					
 					}
 					

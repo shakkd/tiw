@@ -6,32 +6,38 @@
 </head>
 <body>
 
+<form method="post">
+<p align="center">
+<table width="100%">
 
-<table>
 <tr>
-<!--  farli bottoni per invertire ordinamento -->
-  <th>Matricola</th>
-  <th>Cognome</th>
-  <th>Nome</th>
-  <th>Email</th>
-  <th>Corso Di Laurea</th>
-  <th>Voto</th>
-  <th>Stato di valutazione</th>
+  <td align="center"><input type=submit name="order" value="Matricola" style="width:100%"></td>
+  <td align="center"><input type=submit name="order" value="Cognome" style="width:100%"></td>
+  <td align="center"><input type=submit name="order" value="Nome" style="width:100%"></td>
+  <td align="center"><input type=submit name="order" value="Email" style="width:100%"></td>
+  <td align="center"><input type=submit name="order" value="Corso di laurea" style="width:100%"></td>
+  <td align="center"><input type=submit name="order" value="Voto" style="width:100%"></td>
+  <td align="center"><input type=submit name="order" value="Stato di valutazione" style="width:100%"></td>
   <th></th>
 </tr>
+
 <tr th:each="utenteVoto : ${utentiVoto}">
-  <td th:text="${utenteVoto.getUtente().getMatricola()}"></td>
-  <td th:text="${utenteVoto.getUtente().getCognome()}"></td>
-  <td th:text="${utenteVoto.getUtente().getNome()}"></td>
-  <td th:text="${utenteVoto.getUtente().getEmail()}"></td>
-  <td th:text="${utenteVoto.getUtente().getNomeCorsoLaurea()}"></td>
-  <td th:text="${utenteVoto.getStato()}"></td>
-  <td th:text="${utenteVoto.getVoto()}"></td>
-  <!-- pensare come fare sto bottone -->
-  <td><input type="submit" value="modifica"></input></td>
-  
+  <td align="center" th:text="${utenteVoto.getUtente().getMatricola()}"></td>
+  <td align="center" th:text="${utenteVoto.getUtente().getCognome()}"></td>
+  <td align="center" th:text="${utenteVoto.getUtente().getNome()}"></td>
+  <td align="center" th:text="${utenteVoto.getUtente().getEmail()}"></td>
+  <td align="center" th:text="${utenteVoto.getUtente().getNomeCorsoLaurea()}"></td>
+  <td align="center" th:text="${utenteVoto.getVoto()}"></td>
+  <td align="center" th:text="${utenteVoto.getStato()}"></td>
+  <td><button type="submit" name="matr" th:value="${utenteVoto.getUtente().getMatricola()}">modifica</button></td>
 </tr>
 </table>
+
+<input type="submit" name="submit" value="pubblica"></input>
+<input type="submit" name="submit" value="verbalizza"></input>
+
+</p>
+</form>
 
 </body>
 </html>

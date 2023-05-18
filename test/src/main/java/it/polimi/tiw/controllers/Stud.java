@@ -2,8 +2,10 @@ package it.polimi.tiw.controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -19,25 +21,29 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.beans.Utente;
+import it.polimi.tiw.beans.UtenteVoto;
 import it.polimi.tiw.dao.DataAccess;
 
 
-//sfrutta motore per main page(gestita da home servlet),
-//  la pagina di login reinderizza alla main page, dalla main page si sfruttano
-//  tutte le funzioni e ritornano
-
-@WebServlet("/login")
-public class Login extends HttpServlet {
+@WebServlet("/studente")
+public class Stud extends HttpServlet {
+	
 	
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 	private static final long serialVersionUID = 1L;
-	       
+	
 	DataAccess dao;
 	
-    public Login() {
+	int matr;
+	UtenteVoto curr = null;
+	List<UtenteVoto> list;
+	
+    public Stud() {
         super();
+        // TODO Auto-generated constructor stub
     }
+    
 
     public void init() throws ServletException {
     	
@@ -72,67 +78,76 @@ public class Login extends HttpServlet {
 		//tmpl.setSuffix(".html");
 		
 	}
-    
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		response.setContentType("text/html");
 		
 		PrintWriter out = response.getWriter();
-
+	  	   
 		
-		//check session-context attributes
-		//request.getRequestDispatcher("/WEB-INF/testpage.html").include(request, response);
-	  	    
-				
-		String path = "/WEB-INF/html/loginpage.html";
+		String path = "/WEB-INF/html/studform.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext);
 		
-		//String var = "var123";
-		//ctx.setVariable("var", var);
+		matr = Integer.parseInt(request.getParameter("matr"));
 		
-		templateEngine.process(path, ctx, out);		
-		
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
-		
-		PrintWriter out = response.getWriter();
-				
-		String email = request.getParameter("email");
-		String passw = request.getParameter("pass");
-		
-		boolean ok = false;
-		String ret = null;
 		
 		try {
-			for(Utente tmp : dao.findAllUtenti())
-				if(tmp.getEmail().equals(email) && tmp.getPassword().equals(passw)) {
-					ok = true;
-					request.getSession().setAttribute("type", tmp.getTipo());
-				}
-
-			ret = Integer.toString( dao.getIdUtente(email) );
 			
-			request.getSession().setAttribute("idUtente", ret);
-
-		} catch (SQLException e) {
+			list = (List<UtenteVoto>) dao.findUtentiVoto((String)request.getSession().getAttribute("data"), 
+					(String)request.getSession().getAttribute("corso"), null, null);
+			
+			for (UtenteVoto tmp : list) if(tmp.getUtente().getMatricola() == matr) {
+				curr = tmp;
+				break;
+			}
+			
+			ctx.setVariable("utenteVoto", curr);
+			ctx.setVariable("voti", new DataAccess(connection).findVoti());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-						
-		if(ok)
-			response.sendRedirect("/test/home");
-		else {
-			doGet(request, response);
-			out.println("access denied");
-		}
-	    
 		
-	    
+		
+		templateEngine.process(path, ctx, out);
+		
 	}
+
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String mode = request.getParameter("submit");
+		
+		switch (mode){
+			case "back":
+				response.sendRedirect("/test/iscritti?data=" + request.getSession().getAttribute("data") + 
+						"&corso=" + request.getSession().getAttribute("corso") + "&order=Matricola");
+				break;
+			case "insert":
+								
+				try {
+					
+					curr.setVoto(request.getParameter("voto"));
+					curr.setStato("Inserito");
+							
+					
+					new DataAccess(connection).updateUtenteVoto(curr);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				doGet(request, response);
+				break;
+				
+		}
+		
+		
+		
+	}
+
 	
-	
-    @Override
+	@Override
 	public void destroy() {
 		if (connection != null) {
 			try {
@@ -142,8 +157,6 @@ public class Login extends HttpServlet {
 			}
 		}
 	}
-
 	
-
+	
 }
-	
