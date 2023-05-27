@@ -93,18 +93,25 @@ async function invia() {
 	
 	var rowlist = document.getElementsByClassName("studrow");
 	var invdata = [];
-		
+	
+	var matr, esito;
 	var i = 0;
 	for(var j = 0; j < rowlist.length; j++) if (rowlist[j].children[5].value != "null") {
 		invdata[i] = {};
-		invdata[i]["matr"] = rowlist[j].children[0].innerHTML;
-		invdata[i]["esito"] = rowlist[j].children[5].value;
+		
+		matr = rowlist[j].children[0].innerHTML
+		esito = rowlist[j].children[5].value;
+		
+		invdata[i]["matr"] = matr;
+		invdata[i]["esito"] = esito;
 		rowlist[j].children[5].disabled = true;
+		
+		document.getElementById(matr).children[5].innerHTML = esito;
+		document.getElementById(matr).children[6].innerHTML = "Inserito";
 		
 		i++;
 	}
 	
-	console.log(invdata);
 	
 	await fetch("stud", {
 	  method: 'POST',
@@ -137,7 +144,7 @@ async function pubbl() {
 	formBody = formBody.join("&");
 	
 	
-	var req = await fetch('login', {
+	var req = await fetch('iscritti', {
 	  method: 'POST',
 	  headers: {
 	    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
@@ -148,7 +155,9 @@ async function pubbl() {
 	
 	var arr = document.getElementsByClassName("tdstato");
 	
-	for (var tmp in arr)
+	
+	
+	for (var tmp of arr)
 		if (tmp.innerHTML = "Inserito") tmp.innerHTML = "Pubblicato";
 	
 	
@@ -169,7 +178,7 @@ async function verbal() {
 	formBody = formBody.join("&");
 	
 	
-	var req = await fetch('login', {
+	var req = await fetch('iscritti', {
 	  method: 'POST',
 	  headers: {
 	    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
@@ -179,7 +188,7 @@ async function verbal() {
 	
 	var arr = document.getElementsByClassName("tdstato");
 	
-	for (var tmp in arr)
+	for (var tmp of arr)
 		if (tmp.innerHTML = "Pubblicato") tmp.innerHTML = "Verbalizzato";
 	
 }

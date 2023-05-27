@@ -120,13 +120,8 @@ public class Esito extends HttpServlet {
 		try {
 			dao.rifiutaVoto(data, corso, idUtente);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
 		}
-		
-		doGet(request, response);
-		response.getWriter().println("il voto è stato rifiutato");
 	}
 
 	

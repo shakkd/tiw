@@ -45,7 +45,7 @@
   <th align="center"><button type=button name="orderbtn" value="6" style="width:100%">Stato di valutazione</button></th>
 </tr>
 
-<tr th:each="utenteVoto : ${utentiVoto}">
+<tr th:each="utenteVoto : ${utentiVoto}" th:id="${utenteVoto.getUtente().getMatricola()}">
   <td align="center" th:text="${utenteVoto.getUtente().getMatricola()}"></td>
   <td align="center" th:text="${utenteVoto.getUtente().getCognome()}"></td>
   <td align="center" th:text="${utenteVoto.getUtente().getNome()}"></td>

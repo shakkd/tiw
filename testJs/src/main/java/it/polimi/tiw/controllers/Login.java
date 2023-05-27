@@ -82,8 +82,8 @@ public class Login extends HttpServlet {
 		
 		PrintWriter out = response.getWriter();
 		
-		request.getSession().removeAttribute("data");
-		request.getSession().removeAttribute("corso");
+		request.getSession().removeAttribute("idUtente");
+		request.getSession().removeAttribute("type");
 
 		
 		//check session-context attributes

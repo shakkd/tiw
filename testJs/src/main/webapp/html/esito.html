@@ -20,9 +20,10 @@ voto:
   <option text="" th:selected="${ utenteVoto.getVoto() == null }"></option>
 </select>
 
-stato di valutazione: <input type="text" name="stato di valutazione" th:value="${utenteVoto.getStato()}" disabled></input><br>
-<input type="submit" value="rifiuta" th:if="${ utenteVoto.getRifiutabile() }">
-
+stato di valutazione: <input type="text" name="stato di valutazione" id="stato" th:value="${utenteVoto.getStato()}" disabled></input><br>
+<button type="button" id="rejbtn" th:if="${ utenteVoto.getRifiutabile() }">rifiuta</button>
+<button type="button" id="backbtn" >indietro</button>
+<p id="errbox"></p>
 
 
 
