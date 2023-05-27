@@ -20,6 +20,8 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.google.gson.Gson;
+
 import it.polimi.tiw.beans.Utente;
 import it.polimi.tiw.dao.DataAccess;
 
@@ -32,7 +34,7 @@ public class Home extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	String idUtente = null;
-	
+	String flag = null;
 	DataAccess dao;
 		
 	
@@ -77,7 +79,6 @@ public class Home extends HttpServlet {
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		
 		response.setContentType("text/html");
 		
 		PrintWriter out = response.getWriter();
@@ -89,18 +90,18 @@ public class Home extends HttpServlet {
 
 		
 				
-		String path = "/WEB-INF/html/home.html";
+		String path = "html/home.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext);
 		
 		idUtente = (String) request.getSession().getAttribute("idUtente");
 		
 		try {
-			String flag = (String)request.getSession().getAttribute("type");
+			flag = (String)request.getSession().getAttribute("type");
 			String arg = request.getParameter("corso");
 			ctx.setVariable("sel1", arg);
 			ctx.setVariable("corsi", dao.getCorsi(flag, idUtente));
-
+			
 			ctx.setVariable("appelli", dao.findAppelliFromCorso(arg, flag, idUtente));			
 			
 		} catch (SQLException e) {
@@ -116,10 +117,24 @@ public class Home extends HttpServlet {
 		String mode = request.getParameter("mode");
 		switch(mode) {
 			case "refresh":
-								
-				doGet(request, response);
-				break;
 				
+				try {
+					
+					String arg = request.getParameter("corso");
+					String json = new Gson().toJson(dao.findAppelliFromCorso(arg, flag, idUtente));
+					
+					
+					response.getWriter().write(json);
+
+
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+				break;
+			
+				
+			/*
 			case "submit":
 				
 				if(request.getParameter("appello") != null) {
@@ -143,7 +158,10 @@ public class Home extends HttpServlet {
 				}
 				
 				break;
-			}
+			*/
+				
+			
+			}	
 			
 	}
 	

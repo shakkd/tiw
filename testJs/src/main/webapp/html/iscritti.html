@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<meta charset="UTF-8">
+<title>Iscritti</title>
+
+</head>
+<body>
+
+<style type="text/css" rel="stylesheet">
+#overlay {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+#box {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; /* Could be more or less, depending on screen size */
+}
+</style>
+
+<form id="studForm" action="#">
+<p align="center">
+<table width="100%" id="studTable">
+
+<tr>
+  <th align="center"><button type=button name="orderbtn" value="0" style="width:100%">Matricola</button></th>
+  <th align="center"><button type=button name="orderbtn" value="1" style="width:100%">Cognome</button></th>
+  <th align="center"><button type=button name="orderbtn" value="2" style="width:100%">Nome</button></th>
+  <th align="center"><button type=button name="orderbtn" value="3" style="width:100%">Email</button></th>
+  <th align="center"><button type=button name="orderbtn" value="4" style="width:100%">Corso di laurea</button></th>
+  <th align="center"><button type=button name="orderbtn" value="5" style="width:100%">Voto</button></th>
+  <th align="center"><button type=button name="orderbtn" value="6" style="width:100%">Stato di valutazione</button></th>
+</tr>
+
+<tr th:each="utenteVoto : ${utentiVoto}">
+  <td align="center" th:text="${utenteVoto.getUtente().getMatricola()}"></td>
+  <td align="center" th:text="${utenteVoto.getUtente().getCognome()}"></td>
+  <td align="center" th:text="${utenteVoto.getUtente().getNome()}"></td>
+  <td align="center" th:text="${utenteVoto.getUtente().getEmail()}"></td>
+  <td align="center" th:text="${utenteVoto.getUtente().getNomeCorsoLaurea()}"></td>
+  <td align="center" th:text="${utenteVoto.getVoto()}"></td>
+  <td align="center" th:text="${utenteVoto.getStato()}" class="tdstato"></td>
+  
+  <!-- td>
+  < input type="hidden" th:value="${utenteVoto.getUtente().getMatricola()}">
+  <button type="button" th:value="${utenteVoto.getUtente().getMatricola()}" id="modbtn">modifica</button>
+  </td-->
+  
+</tr>
+</table>
+
+<button type="button" id="backbtn">indietro</button>
+<button type="button" id="pubblbtn">pubblica</button>
+<button type="button" id="verbalbtn">verbalizza</button>
+
+
+</p>
+</form>
+
+<button type="button" onclick="document.getElementById('overlay').style.display='block'" >modifica multipla</button>
+
+
+<div id="overlay">
+<div id="box">
+
+<div th:each="tmp : ${utentiVoto}">
+<div class="studrow" th:if="${tmp.getStato() == 'Non inserito'}" style="display:block">
+
+<span th:text="${tmp.getUtente().getMatricola()}"></span>
+<span text=", "></span>
+<span th:text="${tmp.getUtente().getCognome()}"></span>
+<span text=" "></span>
+<span th:text="${tmp.getUtente().getNome()}"></span>
+
+<select name="voto">  
+<option value="null" text="" selected></option>
+<option th:each="i : ${voti}" th:value="${i}" th:text="${i}" ></option> 
+</select>
+</div>
+</div>
+
+<button type="button" id="invbtn" onclick="document.getElementById('overlay').style.display='none'" >invia</button>
+</div>
+</div>
+
+
+
+</body>
+</html>

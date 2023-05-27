@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Esito</title>
+</head>
+<body>
+
+<form name="data" method="post">
+
+matricola: <input type="text" name="matricola" th:value="${utenteVoto.getUtente().getMatricola()}" disabled></input><br>
+cognome: <input type="text" name="cognome" th:value="${utenteVoto.getUtente().getCognome()}" disabled></input><br>
+nome: <input type="text" name="nome" th:value="${utenteVoto.getUtente().getNome()}" disabled></input><br>
+email: <input type="text" name="email" th:value="${utenteVoto.getUtente().getEmail()}" disabled></input><br>
+corso di laurea: <input type="text" name="corso di laurea" th:value="${utenteVoto.getUtente().getNomeCorsoLaurea()}" disabled></input><br>
+
+voto:
+<select name="voto" disabled>  
+  <option th:text="${utenteVoto.getVoto()}" ></option> 
+  <option text="" th:selected="${ utenteVoto.getVoto() == null }"></option>
+</select>
+
+stato di valutazione: <input type="text" name="stato di valutazione" th:value="${utenteVoto.getStato()}" disabled></input><br>
+<input type="submit" value="rifiuta" th:if="${ utenteVoto.getRifiutabile() }">
+
+
+
+
+</form>
+
+
+</body>
+</html>

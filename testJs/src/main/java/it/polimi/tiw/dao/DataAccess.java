@@ -90,14 +90,15 @@ public class DataAccess {
 		try (Statement stmnt = connection.createStatement();
 				ResultSet result = stmnt.executeQuery(
 					String.format(
-							"SELECT DISTINCT data FROM Corso C, IscrizAppello I%s WHERE I.nomeCorso = C.nomeCorso AND I.nomeCorso = '" + corso
-							+ "'%s ORDER BY data DESC"
-					, add1, add2)
+							"SELECT DISTINCT data FROM Corso C, IscrizAppello I%s WHERE I.nomeCorso = C.nomeCorso AND I.nomeCorso = '%s'"
+							+ "%s ORDER BY data DESC"
+					, add1, corso, add2)
 				);) {
 
 			while (result.next()) ret.add(result.getDate("data"));
 
 		}
+		
 		return ret;
 		
 	}
@@ -193,6 +194,15 @@ public class DataAccess {
 		}
 	}
 	
+	public int getIdByMatricola(String matr) throws SQLException {
+		try (Statement stmnt = connection.createStatement();
+				ResultSet result = stmnt.executeQuery("SELECT idUtente FROM Utente WHERE matricola = " + matr ); ){
+
+			result.next();
+			return result.getInt("idUtente");
+		}
+	}
+	
 	public void updateUtenteVoto(UtenteVoto utenteVoto) throws SQLException {
 		try (PreparedStatement stmnt = connection.prepareStatement("UPDATE IscrizAppello SET  esito = '"
 				+ utenteVoto.getVoto() + "', stato = '" + utenteVoto.getStato()
@@ -267,6 +277,21 @@ public class DataAccess {
 		try (PreparedStatement stmnt = connection.prepareStatement(
 				"UPDATE IscrizAppello SET stato = 'Rifiutato' WHERE data = '" + data
 				+ "' AND nomeCorso = '" + corso + "' AND idUtente = " + idUtente
+				); ){	
+			
+			stmnt.executeUpdate();
+			
+			return;
+		}
+		
+	}
+	
+	
+	public void updateEsitoById(String data, String corso, String idUtente, String esito) throws SQLException {
+		
+		try (PreparedStatement stmnt = connection.prepareStatement(
+				"UPDATE IscrizAppello SET stato = 'Inserito', esito = " + esito + " WHERE data = '"
+				+ data + "' AND nomeCorso = '" + corso + "' AND idUtente = " + idUtente
 				); ){	
 			
 			stmnt.executeUpdate();

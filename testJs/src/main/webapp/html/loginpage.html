@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+
+</head>
+
+<body>
+
+<!--
+<h1 th:text="${test}">static</h1>
+<h1 th:text="${var}">static</h1>
+-->
+
+<h1>login</h1><br>
+enter email and password
+
+<!--form method="post" th:action="@{/Home}"-->
+
+<form id="loginform" action="#">
+email: <input type="text" name="email"></input><br>
+pass: <input type="password" name="pass"></input><br>
+<button type="button" id="subbtn">submit</button> 
+
+
+<!--input type="button" name="action" value="login"></input--> 
+
+</form>
+
+<p id="errbox"></p>
+
+
+<script src="js/login.js"></script>
+
+</body>
+</html>

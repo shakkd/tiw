@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<meta charset="UTF-8">
+<title>Home page</title>
+
+<script src="js/utils.js" defer></script>
+
+
+</head>
+<body>
+<h1>homepage</h1><br>
+
+<form id="selform" action="#">
+<select name="corso">  
+  <option th:each="i : ${corsi}" th:value="${i}" th:text="${i}" th:selected="${i == sel1}"></option> 
+</select><br>
+
+<select name="appello" id="datesel">  
+  <option th:each="i : ${appelli}" th:value="${i}" th:text="${i}"></option> 
+</select><br>
+
+<button type="button" id="refrbtn">refresh</button>
+<button type="button" id="subbtn">submit</button> 
+</form>
+
+<p id="errbox"></p>
+
+
+<script src="js/home.js"></script>
+
+</body>
+</html>

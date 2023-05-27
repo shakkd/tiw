@@ -1,11 +1,10 @@
 package it.polimi.tiw.controllers;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -20,27 +19,29 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
+import com.google.gson.Gson;
+
 import it.polimi.tiw.beans.Utente;
 import it.polimi.tiw.dao.DataAccess;
 
 
-@WebServlet("/home")
-public class Home extends HttpServlet {
+//sfrutta motore per main page(gestita da home servlet),
+//  la pagina di login reinderizza alla main page, dalla main page si sfruttano
+//  tutte le funzioni e ritornano
+
+@WebServlet("/login")
+public class Login extends HttpServlet {
 	
 	private Connection connection = null;
 	private TemplateEngine templateEngine;
 	private static final long serialVersionUID = 1L;
-	
-	String idUtente = null;
-	
+	       
 	DataAccess dao;
-		
 	
-    public Home() {
+    public Login() {
         super();
-        // TODO Auto-generated constructor stub
     }
-    
+
     public void init() throws ServletException {
     	
     	//connection setup
@@ -77,77 +78,70 @@ public class Home extends HttpServlet {
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		
 		response.setContentType("text/html");
 		
 		PrintWriter out = response.getWriter();
 		
-		
-		//request.getSession().removeAttribute("utentiVoto");
 		request.getSession().removeAttribute("data");
 		request.getSession().removeAttribute("corso");
 
 		
+		//check session-context attributes
+		//request.getRequestDispatcher("/WEB-INF/testpage.html").include(request, response);
+	  	    
 				
-		String path = "/WEB-INF/html/home.html";
+		String path = "/html/loginpage.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext);
 		
-		idUtente = (String) request.getSession().getAttribute("idUtente");
+		
+		//String var = "var123";
+		//ctx.setVariable("var", var);
+		
+		templateEngine.process(path, ctx, out);
+		
+
+		
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
+				
+		PrintWriter out = response.getWriter();
+				
+		String email = request.getParameter("email");
+		String passw = request.getParameter("pass");
+				
+		String ret = null;
+		String flag = null;
 		
 		try {
-			String flag = (String)request.getSession().getAttribute("type");
-			String arg = request.getParameter("corso");
-			ctx.setVariable("sel1", arg);
-			ctx.setVariable("corsi", dao.getCorsi(flag, idUtente));
+			for(Utente tmp : dao.findAllUtenti())
+				if(tmp.getEmail().equals(email) && tmp.getPassword().equals(passw)) {
+					
+					flag = tmp.getTipo();
+										
+					ret = Integer.toString( dao.getIdUtente(email) );
+					request.getSession().setAttribute("idUtente", ret);
+					request.getSession().setAttribute("type", flag);
+					
+					break;
+				}
 
-			ctx.setVariable("appelli", dao.findAppelliFromCorso(arg, flag, idUtente));			
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		templateEngine.process(path, ctx, out);			
-		
-	}
 
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//System.out.println(ok);
+				
+		String json = new Gson().toJson(new String[]{flag, ret});
 		
-		String mode = request.getParameter("mode");
-		switch(mode) {
-			case "refresh":
-								
-				doGet(request, response);
-				break;
-				
-			case "submit":
-				
-				if(request.getParameter("appello") != null) {
-					
-					switch ((String)request.getSession().getAttribute("type")) {
-						case "S":
-							response.sendRedirect("/test/esito?data=" + request.getParameter("appello") + 
-									"&corso=" + request.getParameter("corso") + "&idUtente=" + idUtente);
-							break;
-						case "D":
-							response.sendRedirect("/test/iscritti?data=" + request.getParameter("appello") + 
-									"&corso=" + request.getParameter("corso") + "&order=Matricola");
-							break;					
-					}
-					
-					
-				}
-				else {
-					doGet(request, response);
-					response.getWriter().println("select a date");	
-				}
-				
-				break;
-			}
-			
+		response.getWriter().write(json);
+		
+	    
 	}
 	
-	@Override
+	
+    @Override
 	public void destroy() {
 		if (connection != null) {
 			try {
@@ -157,6 +151,8 @@ public class Home extends HttpServlet {
 			}
 		}
 	}
+
 	
 
 }
+	

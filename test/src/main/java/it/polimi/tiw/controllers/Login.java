@@ -110,11 +110,14 @@ public class Login extends HttpServlet {
 				if(tmp.getEmail().equals(email) && tmp.getPassword().equals(passw)) {
 					ok = true;
 					request.getSession().setAttribute("type", tmp.getTipo());
+					
+					ret = Integer.toString( dao.getIdUtente(email) );
+					
+					request.getSession().setAttribute("idUtente", ret);
+					break;
 				}
 
-			ret = Integer.toString( dao.getIdUtente(email) );
 			
-			request.getSession().setAttribute("idUtente", ret);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
