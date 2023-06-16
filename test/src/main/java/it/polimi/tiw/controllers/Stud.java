@@ -51,7 +51,7 @@ public class Stud extends HttpServlet {
     	try {
     		final String DB_URL = "jdbc:mysql://localhost:3306/dbtest?serverTimezone=UTC";
     	    final String USER = "root";
-    	    final String PASS = "MirkoGentile9!";
+    	    final String PASS = "Frangi.01";
     	    
 		    Class.forName("com.mysql.cj.jdbc.Driver");
 	    	connection = DriverManager.getConnection(DB_URL, USER, PASS);
