@@ -31,11 +31,40 @@ async function load(url, body, element) {
 }
 
 function formatDate(date) {
+	tmp = date.split(' ');
+	switch(tmp[0]){
+		case 'gen':
+			tmp[0] = 'jan';
+			break;
+		case 'mag':
+			tmp[0] = 'may';
+			break;
+		case 'giu':
+			tmp[0] = 'jun';
+			break;
+		case 'lug':
+			tmp[0] = 'jul';
+			break;
+		case 'ago':
+			tmp[0] = 'aug';
+			break;
+		case 'set':
+			tmp[0] = 'sep';
+			break;
+		case 'ott':
+			tmp[0] = 'oct';
+			break;
+		case 'dic':
+			tmp[0] = 'dec';
+			break;
+		default:		
+	}
+	date = tmp.join('');
     var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
+    	month = '' + (d.getMonth() + 1),
         day = '' + d.getDate(),
         year = d.getFullYear();
-
+	console.log(d);
     if (month.length < 2) 
         month = '0' + month;
     if (day.length < 2) 
