@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Login</title>
-
 </head>
 
 <body>
@@ -14,17 +13,17 @@
 -->
 
 <h1>login</h1><br>
-enter email and password
+<form method="post">
+
+enter login credentials<br><br>
 
 <!--form method="post" th:action="@{/Home}"-->
 
-<form id="loginform" action="#">
-email: <input type="text" name="email"></input><br>
-pass: <input type="password" name="pass"></input><br>
-<button type="button" id="subbtn">submit</button> 
+<input type="text" name="email" placeholder="email"></input><br>
+<input type="password" name="pass" placeholder="password"></input><br>
+<input type="submit" value="submit"></input> 
 
-
-<!--input type="button" name="action" value="login"></input--> 
+<!--input type="submit" name="action" value="login"></input--> 
 
 </form>
 

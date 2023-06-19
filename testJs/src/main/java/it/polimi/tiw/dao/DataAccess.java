@@ -231,13 +231,27 @@ public class DataAccess {
 	
 	public void verbalizzaEsiti(String data, String corso) throws SQLException {
 		try (PreparedStatement stmnt = connection.prepareStatement(
-				"UPDATE IscrizAppello SET stato = 'Verbalizzato' WHERE data = '" + data
-				+ "' AND nomeCorso = '" + corso + "' AND (stato = 'Pubblicato' OR stato = 'Rifiutato')"
-				); ){	
-			
+				
+				"INSERT INTO Verbale (dataVerb, ora, nomeCorso, data) VALUES (curdate(), curtime() , '"
+				+ corso + "', '" + data + "')"
+							
+			); ){	
+		
 			stmnt.executeUpdate();
 			
-			return;
+		}
+		
+		try (PreparedStatement stmnt = connection.prepareStatement(
+				
+				"UPDATE IscrizAppello SET stato = 'Verbalizzato', idVerbale = "
+				+ "(SELECT idVerbale FROM Verbale WHERE data = '" + data + "' AND nomeCorso = '" + corso + "') "
+				+ "WHERE data = '" + data + "' AND nomeCorso = '" + corso
+				+ "' AND (stato = 'Pubblicato' OR stato = 'Rifiutato')"
+							
+			); ){	
+		
+			stmnt.executeUpdate();
+		
 		}
 		
 	}
