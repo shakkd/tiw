@@ -98,16 +98,18 @@ public class Esito extends HttpServlet {
 		try {
 			ret = dao.findEsito(data, corso, idUtente);
 			
-			
+			if(ret.getVoto() == null) out.println("voto non ancora definito");
+			else ctx.setVariable("utenteVoto", ret);
+					
+			templateEngine.process(path, ctx, out);
 			
 		} catch (SQLException e) {
+		
+			out.println("dato non trovato");
+			
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		if(ret.getVoto() == null) out.println("voto non ancora definito");
-		else ctx.setVariable("utenteVoto", ret);
-				
-		templateEngine.process(path, ctx, out);	
 		
 		
 	}

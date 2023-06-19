@@ -127,7 +127,7 @@ public class Home extends HttpServlet {
 					switch ((String)request.getSession().getAttribute("type")) {
 						case "S":
 							response.sendRedirect("/test/esito?data=" + request.getParameter("appello") + 
-									"&corso=" + request.getParameter("corso") + "&idUtente=" + idUtente);
+									"&corso=" + request.getParameter("corso"));
 							break;
 						case "D":
 							response.sendRedirect("/test/iscritti?data=" + request.getParameter("appello") + 

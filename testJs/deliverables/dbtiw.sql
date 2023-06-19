@@ -106,13 +106,14 @@ CREATE TABLE `IscrizAppello` (
   `esito` varchar(45) DEFAULT NULL,
   `stato` varchar(45) NOT NULL,
   PRIMARY KEY (`nomeCorso`,`idUtente`,`data`),
-  KEY `dataappell_idx` (`data`),
   KEY `idappell_idx` (`idUtente`),
   KEY `voto_idx` (`esito`),
+  KEY `dataappell_idx` (`data`,`nomeCorso`),
   CONSTRAINT `corsoappell` FOREIGN KEY (`nomeCorso`) REFERENCES `Corso` (`nomeCorso`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `dataappell` FOREIGN KEY (`data`) REFERENCES `Appello` (`data`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `dataappell` FOREIGN KEY (`data`, `nomeCorso`) REFERENCES `Appello` (`data`, `nomeCorso`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `idappell` FOREIGN KEY (`idUtente`) REFERENCES `Utente` (`idUtente`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `voto` FOREIGN KEY (`esito`) REFERENCES `Voto` (`nomeVoto`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `iscriz` FOREIGN KEY (`nomeCorso`, `idUtente`) REFERENCES `IscrizCorso` (`nomeCorso`, `idUtente`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `voto` FOREIGN KEY (`esito`) REFERENCES `Voto` (`nomeVoto`),
   CONSTRAINT `iscrizappello_chk_1` CHECK (((`stato` = _utf8mb4'Non inserito') or (`stato` = _utf8mb4'Inserito') or (`stato` = _utf8mb4'Pubblicato') or (`stato` = _utf8mb4'Rifiutato') or (`stato` = _utf8mb4'Verbalizzato')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -123,7 +124,7 @@ CREATE TABLE `IscrizAppello` (
 
 LOCK TABLES `IscrizAppello` WRITE;
 /*!40000 ALTER TABLE `IscrizAppello` DISABLE KEYS */;
-INSERT INTO `IscrizAppello` VALUES ('Algoritmi','2023-01-04',3,NULL,'Non inserito'),('Algoritmi','2023-01-04',8,NULL,'Non inserito'),('Analisi 1','2023-01-01',1,NULL,'Non inserito'),('Analisi 1','2023-01-02',1,NULL,'Non inserito'),('Analisi 1','2023-01-01',3,NULL,'Non inserito'),('Analisi 1','2023-01-02',3,NULL,'Non inserito'),('Analisi 1','2023-01-01',5,NULL,'Non inserito'),('Analisi 1','2023-01-02',8,NULL,'Non inserito'),('Analisi 2','2023-01-02',1,NULL,'Non inserito'),('Analisi 2','2023-01-02',5,NULL,'Non inserito'),('Analisi 2','2023-01-25',8,NULL,'Non inserito'),('Fisica 1','2023-02-03',1,NULL,'Non inserito'),('Fisica 1','2023-02-03',5,NULL,'Non inserito'),('Fisica 1','2023-02-03',8,NULL,'Non inserito');
+INSERT INTO `IscrizAppello` VALUES ('Algoritmi','2023-01-04',3,'26','Inserito'),('Algoritmi','2023-01-04',8,NULL,'Non inserito'),('Analisi 1','2023-01-01',1,'26','Rifiutato'),('Analisi 1','2023-01-05',1,'26','Inserito'),('Analisi 1','2023-01-01',3,'26','Pubblicato'),('Analisi 1','2023-01-05',3,'26','Pubblicato'),('Analisi 1','2023-01-05',8,'24','Inserito'),('Analisi 2','2023-01-02',1,'26','Inserito'),('Analisi 2','2023-01-02',5,'28','Pubblicato'),('Analisi 2','2023-01-25',8,'25','Verbalizzato'),('Fisica 1','2023-02-03',1,'26','Rifiutato'),('Fisica 1','2023-02-03',5,'28','Verbalizzato'),('Fisica 1','2023-02-03',8,NULL,'Non inserito');
 /*!40000 ALTER TABLE `IscrizAppello` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -135,9 +136,10 @@ DROP TABLE IF EXISTS `IscrizCorso`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `IscrizCorso` (
+  `nomeCorso` varchar(25) NOT NULL,
   `idUtente` int NOT NULL,
-  `nomeCorso` varchar(45) NOT NULL,
-  PRIMARY KEY (`idUtente`,`nomeCorso`),
+  PRIMARY KEY (`nomeCorso`,`idUtente`),
+  KEY `iscriz` (`idUtente`,`nomeCorso`),
   CONSTRAINT `idiscriz` FOREIGN KEY (`idUtente`) REFERENCES `Utente` (`idUtente`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -148,7 +150,7 @@ CREATE TABLE `IscrizCorso` (
 
 LOCK TABLES `IscrizCorso` WRITE;
 /*!40000 ALTER TABLE `IscrizCorso` DISABLE KEYS */;
-INSERT INTO `IscrizCorso` VALUES (1,'Algoritmi'),(1,'Analisi 1'),(1,'Analisi 2'),(3,'Algoritmi'),(3,'Analisi 1'),(5,'Analisi 1'),(8,'Algoritmi'),(8,'Analisi 1'),(8,'Analisi 2'),(8,'Fisica 1');
+INSERT INTO `IscrizCorso` VALUES ('Algoritmi',1),('Algoritmi',3),('Algoritmi',8),('Analisi 1',1),('Analisi 1',3),('Analisi 1',5),('Analisi 1',8),('Analisi 2',1),('Analisi 2',5),('Analisi 2',8),('Fisica 1',1),('Fisica 1',5),('Fisica 1',8);
 /*!40000 ALTER TABLE `IscrizCorso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -209,6 +211,10 @@ INSERT INTO `Voto` VALUES ('18'),('19'),('20'),('21'),('22'),('23'),('24'),('25'
 UNLOCK TABLES;
 
 --
+-- Dumping events for database 'dbtest'
+--
+
+--
 -- Dumping routines for database 'dbtest'
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -221,4 +227,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-17 17:03:33
+-- Dump completed on 2023-05-27 16:52:13

@@ -134,6 +134,9 @@ public class DataAccess {
 			case "Stato di valutazione":
 				conc1 = " ORDER BY stato";
 				break;
+			default:
+				conc1 = "";
+				
 		}
 		
 		if (flag1 != null) switch (flag2) {
@@ -208,8 +211,8 @@ public class DataAccess {
 	
 	public void pubblicaEsiti(String data, String corso) throws SQLException {
 		try (PreparedStatement stmnt = connection.prepareStatement(
-				"UPDATE IscrizAppello SET stato = 'Pubblicato' WHERE data = '" + data
-				+ "' AND nomeCorso = '" + corso + "' AND stato = 'Inserito'"
+					"UPDATE IscrizAppello SET stato = 'Pubblicato' WHERE data = '" + data
+					+ "' AND nomeCorso = '" + corso + "' AND stato = 'Inserito'"
 				); ){	
 			
 			stmnt.executeUpdate();
@@ -221,14 +224,29 @@ public class DataAccess {
 	
 	public void verbalizzaEsiti(String data, String corso) throws SQLException {
 		try (PreparedStatement stmnt = connection.prepareStatement(
-				"UPDATE IscrizAppello SET stato = 'Verbalizzato' WHERE data = '" + data
-				+ "' AND nomeCorso = '" + corso + "' AND (stato = 'Pubblicato' OR stato = 'Rifiutato')"
+				
+					"INSERT INTO Verbale (dataVerb, ora, nomeCorso, data) VALUES (curdate(), curtime() , '"
+					+ corso + "', '" + data + "')"
+								
 				); ){	
 			
 			stmnt.executeUpdate();
 			
-			return;
 		}
+		
+		try (PreparedStatement stmnt = connection.prepareStatement(
+				
+				"UPDATE IscrizAppello SET stato = 'Verbalizzato', idVerbale = "
+				+ "(SELECT idVerbale FROM Verbale WHERE data = '" + data + "' AND nomeCorso = '" + corso + "') "
+				+ "WHERE data = '" + data + "' AND nomeCorso = '" + corso
+				+ "' AND (stato = 'Pubblicato' OR stato = 'Rifiutato')"
+							
+			); ){	
+		
+			stmnt.executeUpdate();
+		
+		}
+		
 		
 	}
 	

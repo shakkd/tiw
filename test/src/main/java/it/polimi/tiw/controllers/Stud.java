@@ -98,20 +98,33 @@ public class Stud extends HttpServlet {
 			list = (List<UtenteVoto>) dao.findUtentiVoto((String)request.getSession().getAttribute("data"), 
 					(String)request.getSession().getAttribute("corso"), null, null);
 			
+			
+			boolean found = false;
+			
 			for (UtenteVoto tmp : list) if(tmp.getUtente().getMatricola() == matr) {
 				curr = tmp;
+				found = true;
+			
 				break;
 			}
 			
-			ctx.setVariable("utenteVoto", curr);
-			ctx.setVariable("voti", new DataAccess(connection).findVoti());
+			if (!found) 
+				out.println("studente non trovato");
+			else {
+				ctx.setVariable("utenteVoto", curr);
+				ctx.setVariable("voti", new DataAccess(connection).findVoti());
+				
+				templateEngine.process(path, ctx, out);
+				
+			}
+				
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		
-		templateEngine.process(path, ctx, out);
-		
+				
 	}
 
 

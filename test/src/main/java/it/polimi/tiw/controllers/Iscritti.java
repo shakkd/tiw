@@ -141,28 +141,32 @@ public class Iscritti extends HttpServlet {
 			String matr = (String)request.getParameter("matr");
 			response.sendRedirect("/test/studente?matr=" + matr);
 			
-		} else try{
-			switch(request.getParameter("submit")) {
+		} else if (request.getParameter("submit") != null)
+			
+			try {
+				
+				switch(request.getParameter("submit")) {
+			
+					case "pubblica":
+						dao.pubblicaEsiti( (String) request.getSession().getAttribute("data"),
+								(String)request.getSession().getAttribute("corso"));
+						doGet(request, response);
+						break;
+						
+					case "verbalizza":
+						dao.verbalizzaEsiti( (String) request.getSession().getAttribute("data"),
+								(String)request.getSession().getAttribute("corso"));
+						doGet(request, response);
+						break;
 		
-				case "pubblica":
-					dao.pubblicaEsiti( (String) request.getSession().getAttribute("data"),
-							(String)request.getSession().getAttribute("corso"));
-					doGet(request, response);
-					break;
-					
-				case "verbalizza":
-					dao.verbalizzaEsiti( (String) request.getSession().getAttribute("data"),
-							(String)request.getSession().getAttribute("corso"));
-					doGet(request, response);
-					break;
-					
-				default:
-					doGet(request, response);
-	
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
+		
+		else doGet(request, response);
 		
 			
 	}

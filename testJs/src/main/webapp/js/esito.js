@@ -1,5 +1,5 @@
 var rejbtn = document.getElementById("rejbtn")
-rejbtn.addEventListener("click", reject)
+if(rejbtn)rejbtn.addEventListener("click", reject);
 
 var backbtn = document.getElementById("backbtn")
 if (backbtn != null) backbtn.addEventListener("click", () => window.location.href = "home");
