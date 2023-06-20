@@ -104,11 +104,27 @@ public class Stud extends HttpServlet {
 		try {
 		
 			for(int i = 0; i < obj.size(); i++) {
+
+				String arg = ( (JsonObject) obj.get(i) ).get("matr").toString();
 				
-				Integer id = dao.getIdByMatricola( ( (JsonObject) obj.get(i) ).get("matr").toString() );
+				/*
+				int argi = Integer.parseInt(arg.replace("\"", ""));
+				
+				System.out.println(argi);
+				System.out.println(String.valueOf(argi));
+				System.out.println(arg);
+				
+				arg.replace("\"", "");
+				
+				System.out.println(arg);
+				
+				*/
+				
+				Integer id = dao.getIdByMatricola(arg.replace("\"", ""));
+				
 				String esito = ( (JsonObject) obj.get(i) ).get("esito").toString();
 				
-				dao.updateEsitoById(data, corso, id.toString(), esito);
+				dao.updateEsitoById(data, corso, id.toString(), esito.replace("\"", ""));
 				
 			}
 			
