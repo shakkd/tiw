@@ -56,18 +56,20 @@ public class DataAccess {
 		switch(flag) {
 			case "D":
 				tab = "Corso C";
-				add = " INNER JOIN Utente U ON C.idUtente = U.idUtente WHERE U.idUtente = " + idUtente;
+				add = " INNER JOIN Utente U ON C.idUtente = U.idUtente WHERE U.idUtente = ?";
 				break;
 			case "S":
 				tab = "IscrizAppello";
-				add = " WHERE idUtente = " + idUtente;
+				add = " WHERE idUtente = ?";
 				break;
 		}
 		String query = String.format("SELECT DISTINCT nomeCorso FROM %s%s ORDER BY nomeCorso DESC", tab, add);
 		
 		
-		try (Statement stmnt = connection.createStatement();
-				ResultSet result = stmnt.executeQuery(query);) {
+		try (PreparedStatement stmnt = connection.prepareStatement(query)) {
+			
+			stmnt.setString(1, idUtente);
+			ResultSet result = stmnt.executeQuery();
 
 			while (result.next()) ret.add(result.getString("nomeCorso"));
 
@@ -84,21 +86,23 @@ public class DataAccess {
 		
 		if (flag.equals("S")) {
 			add1 = ", Utente U";
-			add2 = " AND U.idUtente = I.idUtente and U.idUtente =" + id;
+			add2 = " AND U.idUtente = I.idUtente and U.idUtente = ?";
 		}
 		
-		try (Statement stmnt = connection.createStatement();
-				ResultSet result = stmnt.executeQuery(
-					String.format(
-							"SELECT DISTINCT data FROM Corso C, IscrizAppello I%s WHERE I.nomeCorso = C.nomeCorso AND I.nomeCorso = '%s'"
-							+ "%s ORDER BY data DESC"
-					, add1, corso, add2)
-				);) {
+		String query = String.format(
+				"SELECT DISTINCT data FROM Corso C, IscrizAppello I%s WHERE I.nomeCorso = C.nomeCorso AND I.nomeCorso = ?%s ORDER BY data DESC"
+		, add1, add2);
+		
+		try (PreparedStatement stmnt = connection.prepareStatement(query)) {
+			
+			if(!add2.equals("")) stmnt.setString(2, id);
+			stmnt.setString(1, corso);
+			
+			ResultSet result = stmnt.executeQuery();
 
 			while (result.next()) ret.add(result.getDate("data"));
 
 		}
-		
 		return ret;
 		
 	}
@@ -107,8 +111,7 @@ public class DataAccess {
 		List<UtenteVoto> ret = new ArrayList<>();
 		
 		String query = "SELECT * FROM IscrizAppello I, Utente U  "
-				+ "WHERE data = '" + arg1 + "' AND nomeCorso = '" 
-				+ arg2 + "' And U.idUtente = I.idUtente";
+				+ "WHERE data = ? AND nomeCorso = ? AND U.idUtente = I.idUtente";
 	
 		String conc1 = "";
 		String conc2 = "";
@@ -135,6 +138,9 @@ public class DataAccess {
 			case "Stato di valutazione":
 				conc1 = " ORDER BY stato";
 				break;
+			default:
+				conc1 = "";
+				
 		}
 		
 		if (flag1 != null) switch (flag2) {
@@ -146,8 +152,13 @@ public class DataAccess {
 				break;
 		}
 		
-		try (Statement stmnt = connection.createStatement();
-				ResultSet result = stmnt.executeQuery(query.concat(conc1).concat(conc2));) {
+		try ( PreparedStatement stmnt = connection.prepareStatement(query.concat(conc1).concat(conc2)) ) {
+			
+			stmnt.setString(1, arg1);
+			stmnt.setString(2, arg2);
+
+			
+			ResultSet result = stmnt.executeQuery();
 
 			while (result.next()) {
 				UtenteVoto tmp = new UtenteVoto();
@@ -186,17 +197,11 @@ public class DataAccess {
 	}
 	
 	public int getIdUtente(String email) throws SQLException {
-		try (Statement stmnt = connection.createStatement();
-				ResultSet result = stmnt.executeQuery("SELECT idUtente FROM Utente WHERE email = '" + email + "'"); ){
-
-			result.next();
-			return result.getInt("idUtente");
-		}
-	}
-	
-	public int getIdByMatricola(String matr) throws SQLException {
-		try (Statement stmnt = connection.createStatement();
-				ResultSet result = stmnt.executeQuery("SELECT idUtente FROM Utente WHERE matricola = " + matr ); ){
+		try (PreparedStatement stmnt = connection.prepareStatement("SELECT idUtente FROM Utente WHERE email = ?")) {
+			
+			
+			stmnt.setString(1, email);
+			ResultSet result = stmnt.executeQuery();
 
 			result.next();
 			return result.getInt("idUtente");
@@ -204,10 +209,13 @@ public class DataAccess {
 	}
 	
 	public void updateUtenteVoto(UtenteVoto utenteVoto) throws SQLException {
-		try (PreparedStatement stmnt = connection.prepareStatement("UPDATE IscrizAppello SET  esito = '"
-				+ utenteVoto.getVoto() + "', stato = '" + utenteVoto.getStato()
-				+ "' WHERE idUtente = (SELECT idUtente FROM Utente WHERE matricola = " + utenteVoto.getUtente().getMatricola() + ")"
-				); ){	
+		try (PreparedStatement stmnt = connection.prepareStatement("UPDATE IscrizAppello SET  esito = ?, stato = ?"
+				+ "WHERE idUtente = (SELECT idUtente FROM Utente WHERE matricola = ?)" ) ){	
+			
+			stmnt.setString(1, utenteVoto.getVoto());
+			stmnt.setString(2, utenteVoto.getStato());
+			stmnt.setInt(3, utenteVoto.getUtente().getMatricola());
+			
 			
 			stmnt.executeUpdate();
 			
@@ -218,9 +226,11 @@ public class DataAccess {
 	
 	public void pubblicaEsiti(String data, String corso) throws SQLException {
 		try (PreparedStatement stmnt = connection.prepareStatement(
-				"UPDATE IscrizAppello SET stato = 'Pubblicato' WHERE data = '" + data
-				+ "' AND nomeCorso = '" + corso + "' AND stato = 'Inserito'"
-				); ){	
+					"UPDATE IscrizAppello SET stato = 'Pubblicato' WHERE data = ? AND nomeCorso = ? AND stato = 'Inserito'"
+				) ){	
+			
+			stmnt.setString(1, data);
+			stmnt.setString(2, corso);
 			
 			stmnt.executeUpdate();
 			
@@ -232,11 +242,13 @@ public class DataAccess {
 	public void verbalizzaEsiti(String data, String corso) throws SQLException {
 		try (PreparedStatement stmnt = connection.prepareStatement(
 				
-				"INSERT INTO Verbale (dataVerb, ora, nomeCorso, data) VALUES (curdate(), curtime() , '"
-				+ corso + "', '" + data + "')"
-							
-			); ){	
-		
+					"INSERT INTO Verbale (dataVerb, ora, nomeCorso, data) VALUES (curdate(), curtime() , ?, ?)"
+								
+				); ){	
+			
+			stmnt.setString(1, data);
+			stmnt.setString(2, corso);
+			
 			stmnt.executeUpdate();
 			
 		}
@@ -244,15 +256,20 @@ public class DataAccess {
 		try (PreparedStatement stmnt = connection.prepareStatement(
 				
 				"UPDATE IscrizAppello SET stato = 'Verbalizzato', idVerbale = "
-				+ "(SELECT idVerbale FROM Verbale WHERE data = '" + data + "' AND nomeCorso = '" + corso + "') "
-				+ "WHERE data = '" + data + "' AND nomeCorso = '" + corso
-				+ "' AND (stato = 'Pubblicato' OR stato = 'Rifiutato')"
+				+ "(SELECT idVerbale FROM Verbale WHERE data = ? AND nomeCorso = ?) "
+				+ "WHERE data = ? AND nomeCorso = ? AND (stato = 'Pubblicato' OR stato = 'Rifiutato')"
 							
 			); ){	
 		
+			stmnt.setString(1, data);
+			stmnt.setString(2, corso);
+			stmnt.setString(3, data);
+			stmnt.setString(4, corso);
+			
 			stmnt.executeUpdate();
 		
 		}
+		
 		
 	}
 	
@@ -261,11 +278,15 @@ public class DataAccess {
 		
 		UtenteVoto ret = new UtenteVoto();
 
-		try (Statement stmnt = connection.createStatement();
-				ResultSet result = stmnt.executeQuery("SELECT * FROM IscrizAppello I"
-						+ " INNER JOIN Utente U on I.idUtente = U.idUtente WHERE data = '"
-						+ data + "' AND nomeCorso = '" + corso + "' AND I.idUtente = " + id); ){
+		try (PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM IscrizAppello I"
+				+ " INNER JOIN Utente U on I.idUtente = U.idUtente WHERE data = ? AND nomeCorso = ? AND I.idUtente = ?");
+				 ){
 
+			stmnt.setString(1, data);
+			stmnt.setString(2, corso);
+			stmnt.setString(3, id);
+			ResultSet result = stmnt.executeQuery();
+			
 			result.next();
 			
 			ret.setUtente(new Utente());
@@ -289,25 +310,42 @@ public class DataAccess {
 	
 	public void rifiutaVoto(String data, String corso, String idUtente) throws SQLException {
 		try (PreparedStatement stmnt = connection.prepareStatement(
-				"UPDATE IscrizAppello SET stato = 'Rifiutato' WHERE data = '" + data
-				+ "' AND nomeCorso = '" + corso + "' AND idUtente = " + idUtente
-				); ){	
+				"UPDATE IscrizAppello SET stato = 'Rifiutato' WHERE data = ? AND nomeCorso = ? AND idUtente = ?" ) ){	
 			
+			stmnt.setString(1, data);
+			stmnt.setString(2, corso);
+			stmnt.setString(3, idUtente);
 			stmnt.executeUpdate();
 			
 			return;
 		}
 		
 	}
+
+	
+	public int getIdByMatricola(String matr) throws SQLException {
+		try (PreparedStatement stmnt = connection.prepareStatement("SELECT idUtente FROM Utente WHERE matricola = ?") ){
+
+			stmnt.setString(1, matr);
+			
+			ResultSet result = stmnt.executeQuery();
+			
+			result.next();
+			return result.getInt("idUtente");
+		}
+	}
 	
 	
 	public void updateEsitoById(String data, String corso, String idUtente, String esito) throws SQLException {
 		
 		try (PreparedStatement stmnt = connection.prepareStatement(
-				"UPDATE IscrizAppello SET stato = 'Inserito', esito = " + esito + " WHERE data = '"
-				+ data + "' AND nomeCorso = '" + corso + "' AND idUtente = " + idUtente
-				); ){	
+				"UPDATE IscrizAppello SET stato = 'Inserito', esito = ? WHERE data = ? AND nomeCorso = ? AND idUtente = ?" ) ){	
 			
+			
+			stmnt.setString(1, esito);
+			stmnt.setString(2, data);
+			stmnt.setString(3, corso);
+			stmnt.setString(4, idUtente);
 			stmnt.executeUpdate();
 			
 			return;
