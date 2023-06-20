@@ -246,8 +246,8 @@ public class DataAccess {
 								
 				); ){	
 			
-			stmnt.setString(1, data);
-			stmnt.setString(2, corso);
+			stmnt.setString(1, corso);
+			stmnt.setString(2, data);
 			
 			stmnt.executeUpdate();
 			

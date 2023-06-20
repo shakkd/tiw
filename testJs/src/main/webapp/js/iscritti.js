@@ -158,7 +158,7 @@ async function pubbl() {
 	
 	
 	for (var tmp of arr)
-		if (tmp.innerHTML = "Inserito") tmp.innerHTML = "Pubblicato";
+		if (tmp.innerHTML == "Inserito") tmp.innerHTML = "Pubblicato";
 	
 	
 }
@@ -189,6 +189,6 @@ async function verbal() {
 	var arr = document.getElementsByClassName("tdstato");
 	
 	for (var tmp of arr)
-		if (tmp.innerHTML = "Pubblicato") tmp.innerHTML = "Verbalizzato";
+		if (tmp.innerHTML == "Pubblicato") tmp.innerHTML = "Verbalizzato";
 	
 }
